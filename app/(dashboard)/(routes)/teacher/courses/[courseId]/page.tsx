@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { Progress } from "@/components/ui/progress";
 import { IconBadge } from "@/components/icon-badge";
 import {
+  Ban,
   CircleDollarSign,
   File,
   LayoutDashboard,
@@ -19,6 +20,9 @@ import CategoryForm from "./_components/CategoryForm";
 import PriceForm from "./_components/PriceForm";
 import AttachmentForm from "./_components/AttachmentForm";
 import ChaptersForm from "./_components/ChaptersForm";
+import { Banner } from "@/components/banner";
+import { Actions } from "./_components/Actions";
+
 
 async function CourceId({ params }: { params: { courseId: string } }) {
   const { userId } = auth();
@@ -74,20 +78,27 @@ async function CourceId({ params }: { params: { courseId: string } }) {
 
   const percentComplete = Math.round((completedFields / totalFields) * 100);
 
+  const isCompleted = requiredFields.every(Boolean);
+
   const completedText = `${completedFields} of ${totalFields} fields completed`;
 
   return (
     <>
-      <h1 className=" pt-6 pl-6 mb-0 text-1xl md:text-3xl font-semibold">
-        Setup/Edit Course
-      </h1>
+      {!course.isPublished && (
+        <Banner label="This course is not published" variant="warning" />
+      )}
+
       <div className="grid px-6 py-2 md:grid-cols-2 gap-4 items-center text-slate-500  ">
-        <p className="text-sm">{completedText}</p>
-
-        <div className="hidden md:block">
+        <div>
+          <h1 className="text-blue-950 mb-0 text-1xl md:text-3xl font-semibold">
+            Setup/Edit Course
+          </h1>
+          <p className="text-sm">{completedText}</p>
           <p className="text-xs">Progress: {percentComplete + "%"}</p>
-
           <Progress value={percentComplete} />
+        </div>
+        <div className="flex items-center justify-start md:justify-end md:pr-6 ">
+          <Actions courseId={course.id} disabled={!isCompleted} isPublished={course.isPublished} />
         </div>
       </div>
       <div className="px-6 py-2">
