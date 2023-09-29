@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getProgress } from "@/actions/get-progress";
 
-import CourseSidebar from "./_components/course-sitebar";
+import { CourseSidebar } from "./_components/course-sitebar";
 import { CourseNavbar } from "./_components/course-navbar";
 
 const CourseLayout = async ({

@@ -105,6 +105,7 @@ model UserProgress {
 
   @@index([userId])
   @@index([chapterId])
+    @@unique([userId, chapterId])
 }
 
 model Purchase {

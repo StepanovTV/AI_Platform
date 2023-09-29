@@ -1,12 +1,13 @@
-import React from "react";
 import { auth } from "@clerk/nextjs";
-import { Course, Chapter, UserProgress } from "@prisma/client";
+import { Chapter, Course, UserProgress } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 import { db } from "@/lib/db";
+import { CourseProgress } from "@/components/course-progress";
+
 import { CourseSidebarItem } from "./course-sidebar-item";
 
-interface CourseSitebarProps {
+interface CourseSidebarProps {
   course: Course & {
     chapters: (Chapter & {
       userProgress: UserProgress[] | null;
@@ -15,14 +16,17 @@ interface CourseSitebarProps {
   progressCount: number;
 }
 
-async function CourseSitebar({ course, progressCount }: CourseSitebarProps) {
+export const CourseSidebar = async ({
+  course,
+  progressCount,
+}: CourseSidebarProps) => {
   const { userId } = auth();
 
   if (!userId) {
     return redirect("/");
   }
 
-  const purchases = await db.purchase.findUnique({
+  const purchase = await db.purchase.findUnique({
     where: {
       userId_courseId: {
         userId,
@@ -35,25 +39,24 @@ async function CourseSitebar({ course, progressCount }: CourseSitebarProps) {
     <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
       <div className="p-8 flex flex-col border-b">
         <h1 className="font-semibold">{course.title}</h1>
-        sadjkdfsjkl;fsdkj
+        {purchase && (
+          <div className="mt-10">
+            <CourseProgress variant="success" value={progressCount} />
+          </div>
+        )}
       </div>
-
       <div className="flex flex-col w-full">
-        {course.chapters.map((chapter) => {
-          return (
-            <CourseSidebarItem
-              key={chapter.id}
-              id={chapter.id}
-              label={chapter.title}
-              isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
-              courseId={course.id}
-              isLocked={!chapter.isFree && !purchases}
-            />
-          );
-        })}
+        {course.chapters.map((chapter) => (
+          <CourseSidebarItem
+            key={chapter.id}
+            id={chapter.id}
+            label={chapter.title}
+            isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
+            courseId={course.id}
+            isLocked={!chapter.isFree && !purchase}
+          />
+        ))}
       </div>
     </div>
   );
-}
-
-export default CourseSitebar;
+};
